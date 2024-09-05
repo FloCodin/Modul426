@@ -18,6 +18,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {GetServerSideProps} from "next";
+import prisma from "@/lib/prisma";
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const products = await prisma.product.findMany({
+    include: {
+      images: true,
+    },
+  });
+  return {
+    props: { products },
+  };
+};
+
 
 export default function Home() {
 
@@ -87,6 +101,20 @@ export default function Home() {
             <p>Card Footer</p>
           </CardFooter>
         </Card>
+      </div>
+      <div>
+        {products.map((product) => (
+            <div key={product.id} className="p-4 bg-gray-100 m-2">
+              <h2>{product.name}</h2>
+              <p>{product.description}</p>
+              <p>Price: {product.price}</p>
+              <div className="flex">
+                {product.images.map((image) => (
+                    <Image key={image.id} src={image.url} width={100} height={100} alt={product.name} />
+                ))}
+              </div>
+            </div>
+        ))}
       </div>
 
     </div>
